@@ -1,0 +1,94 @@
+import re
+from collections import defaultdict
+
+# ---------------------- Student Class ----------------------
+class Student:
+    def __init__(self, student_id, name):
+        self.student_id = student_id
+        self.name = name
+        self.activities = []
+
+    def add_activity(self, activity, date, time):
+        self.activities.append((activity, date, time))
+
+    def activity_summary(self):
+        logins = sum(1 for a in self.activities if a[0] == "LOGIN")
+        submissions = sum(1 for a in self.activities if a[0] == "SUBMIT_ASSIGNMENT")
+        return logins, submissions
+
+
+# ---------------------- Generator Function ----------------------
+def read_log_file(filename):
+    valid_id = re.compile(r"S\d+")
+    valid_activity = {"LOGIN", "LOGOUT", "SUBMIT_ASSIGNMENT"}
+
+    with open(filename, "r") as file:
+        for line in file:
+            try:
+                parts = [p.strip() for p in line.split("|")]
+                if len(parts) != 5:
+                    raise ValueError("Incorrect format")
+
+                student_id, name, activity, date, time = parts
+
+                if not valid_id.fullmatch(student_id):
+                    raise ValueError("Invalid Student ID")
+
+                if activity not in valid_activity:
+                    raise ValueError("Invalid Activity Type")
+
+                yield student_id, name, activity, date, time
+
+            except Exception as e:
+                print(f"Invalid Entry Skipped: {line.strip()} -> {e}")
+
+
+# ---------------------- Main Processing ----------------------
+students = {}
+daily_stats = defaultdict(int)
+login_tracker = defaultdict(int)
+
+for record in read_log_file("student_log.txt"):
+    student_id, name, activity, date, time = record
+
+    if student_id not in students:
+        students[student_id] = Student(student_id, name)
+
+    students[student_id].add_activity(activity, date, time)
+
+    # Daily statistics
+    daily_stats[date] += 1
+
+    # Abnormal behavior detection
+    if activity == "LOGIN":
+        login_tracker[student_id] += 1
+    elif activity == "LOGOUT":
+        login_tracker[student_id] -= 1
+
+
+# ---------------------- Report Generation ----------------------
+report_lines = []
+report_lines.append("STUDENT ACTIVITY REPORT\n")
+
+for student in students.values():
+    logins, submissions = student.activity_summary()
+    report_lines.append(
+        f"{student.student_id} | {student.name} | Logins: {logins} | Submissions: {submissions}"
+    )
+
+report_lines.append("\nDAILY ACTIVITY STATISTICS")
+for date, count in daily_stats.items():
+    report_lines.append(f"{date} : {count} activities")
+
+report_lines.append("\nABNORMAL BEHAVIOR (Multiple logins without logout)")
+for student_id, count in login_tracker.items():
+    if count > 0:
+        report_lines.append(f"{student_id} has {count} active login(s)")
+
+# ---------------------- Output ----------------------
+for line in report_lines:
+    print(line)
+
+with open("activity_report.txt", "w") as output_file:
+    for line in report_lines:
+        output_file.write(line + "\n")
