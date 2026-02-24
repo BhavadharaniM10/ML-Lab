@@ -1,0 +1,14 @@
+STUDENT ACTIVITY REPORT
+
+S101 | Asha | Logins: 2 | Submissions: 0
+S102 | Ravi | Logins: 0 | Submissions: 1
+S103 | Ashi | Logins: 1 | Submissions: 0
+
+DAILY ACTIVITY STATISTICS
+2025-03-10 : 3 activities
+2025-03-11 : 1 activities
+2026-01-07 : 1 activities
+
+ABNORMAL BEHAVIOR (Multiple logins without logout)
+S101 has 1 active login(s)
+S103 has 1 active login(s)

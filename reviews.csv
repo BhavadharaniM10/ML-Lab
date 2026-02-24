@@ -1,0 +1,11 @@
+text,label
+movie was amazing,Positive
+film was very good,Positive
+acting was excellent,Positive
+excellent direction,Positive
+very good acting,Positive
+story was boring,Negative
+movie was terrible,Negative
+film was bad,Negative
+boring movie,Negative
+bad story,Negative
